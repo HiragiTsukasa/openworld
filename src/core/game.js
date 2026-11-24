@@ -47,6 +47,37 @@ export function reportError(err, system = 'core', phase = '') {
   }
 }
 
+/**
+ * clearErrors(match?) → number of removed entries. Removes recorded errors (all, or those whose
+ * `msg + stack` matches a RegExp / contains a string / satisfies a predicate) so they can be
+ * recorded again. For tests that provoke errors on purpose.
+ * @param {RegExp|string|((e: object) => boolean)} [match]
+ * @returns {number}
+ */
+export function clearErrors(match) {
+  let removed = 0;
+  for (let i = errors.length - 1; i >= 0; i--) {
+    const e = errors[i];
+    const text = e.msg + '\n' + e.stack;
+    const hit =
+      match === undefined || match === null
+        ? true
+        : typeof match === 'function'
+          ? match(e) === true
+          : match instanceof RegExp
+            ? match.test(text)
+            : text.indexOf(String(match)) >= 0;
+    if (!hit) continue;
+    errors.splice(i, 1);
+    removed++;
+    errorIndex.forEach((entry, key) => {
+      if (entry === e) errorIndex.delete(key);
+    });
+  }
+  if (match === undefined || match === null) errorIndex.clear();
+  return removed;
+}
+
 function parseFlags() {
   const f = {
     /** dev build (dist/dev.html) */
@@ -204,9 +235,9 @@ export const G = {
   /** THREE.Scene / THREE.PerspectiveCamera — set by the renderer system */
   scene: null,
   camera: null,
-  /** boot state: 'boot' → 'init' → 'ready' */
+  /** boot state: 'boot' → 'init' → 'started' → 'ready' */
   state: 'boot',
-  /** true once every system has been initialised and started */
+  /** true once every system has been initialised and started and the first load finished */
   ready: false,
   /** true while the realtime loop is running */
   running: false,
@@ -254,13 +285,12 @@ export const G = {
   },
 
   /**
-   * startSystems() — calls `start()` of every system in order, marks the game ready and emits
-   * `game:ready {}` then `game:start {newGame}`.
+   * startSystems() — calls `start()` of every system in order (after all inits + save load).
    */
   startSystems() {
     for (let i = 0; i < systems.length; i++) {
       const s = systems[i];
-      if (started.has(s)) continue;
+      if (started.has(s) || !inited.has(s)) continue;
       started.add(s);
       if (typeof s.start === 'function') {
         try {
@@ -269,6 +299,18 @@ export const G = {
           reportError(err, s.name, 'start');
         }
       }
+    }
+    G.state = 'started';
+  },
+
+  /**
+   * finishBoot() — marks the game ready (`G.ready = true`) and emits `game:ready {}` then
+   * `game:start {newGame}`. Systems registered during boot after the init pass are initialised
+   * here; later registrations are initialised immediately.
+   */
+  finishBoot() {
+    for (let i = 0; i < systems.length; i++) {
+      if (!inited.has(systems[i])) lateInit(systems[i]);
     }
     G.state = 'ready';
     G.ready = true;

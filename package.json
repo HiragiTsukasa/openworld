@@ -10,10 +10,10 @@
     "shot": "node tools/shot.mjs"
   },
   "dependencies": {
-    "@dimforge/rapier3d-compat": "latest",
+    "@dimforge/rapier3d-compat": "^0.21.0",
     "three": "0.170.0"
   },
   "devDependencies": {
-    "esbuild": "latest"
+    "esbuild": "^0.28.2"
   }
 }

@@ -87,7 +87,7 @@ for (const group in KEYMAPS) {
 
 const keys = Object.create(null); // code → true while held
 const keyEdges = Object.create(null); // code → true if pressed since last poll
-let keyEdgeList = [];
+const keyEdgeList = [];
 let mouseButtons = 0;
 let mouseEdges = 0;
 let lookAccX = 0;
@@ -475,6 +475,10 @@ export const input = registerSystem({
     const kD = keyDown('KeyS') || keyDown('ArrowDown');
     mx += (kR ? 1 : 0) - (kL ? 1 : 0);
     my += (kU ? 1 : 0) - (kD ? 1 : 0);
+    // per-axis values (vehicles: full steering lock while accelerating) ...
+    const rx = clamp1(mx);
+    const ry = clamp1(my);
+    // ... and the circular stick used for walking
     const len = Math.sqrt(mx * mx + my * my);
     if (len > 1) {
       mx /= len;
@@ -491,7 +495,7 @@ export const input = registerSystem({
     const ta = touch.axes;
     const sa = sim.axes;
     if (group === 'ground') {
-      steer = clamp1(mx + ta.steer);
+      steer = clamp1(rx + ta.steer);
       throttle = Math.max(kU ? 1 : 0, ta.throttle, sim.moveY > 0 ? sim.moveY : 0);
       brake = Math.max(kD ? 1 : 0, ta.brake, sim.moveY < 0 ? -sim.moveY : 0);
     } else if (group === 'air') {
@@ -501,8 +505,8 @@ export const input = registerSystem({
         ta.brake,
         ta.lift < 0 ? -ta.lift : 0
       );
-      pitch = clamp1(-my + ta.pitch);
-      roll = clamp1(mx + ta.roll);
+      pitch = clamp1(-ry + ta.pitch);
+      roll = clamp1(rx + ta.roll);
       yaw = clamp1((keyDown('KeyE') ? 1 : 0) - (keyDown('KeyQ') ? 1 : 0) + ta.yaw);
       lift = clamp1(up - down);
       throttle = up;
