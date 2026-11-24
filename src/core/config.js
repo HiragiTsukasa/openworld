@@ -1,0 +1,213 @@
+// MUGEN CITY — global constants and quality presets.
+// Pure data: safe to import from anywhere (no side effects, no dependencies).
+
+/**
+ * Global engine / world constants. Treat as read-only at runtime
+ * (the only field changed at boot is WORLD_SEED when `?seed=N` is given).
+ */
+export const CONFIG = {
+  TITLE: 'MUGEN CITY',
+  VERSION: '0.1.0',
+
+  // ---- persistence -------------------------------------------------------
+  SAVE_KEY: 'mugencity.save.v1',
+  SETTINGS_KEY: 'mugencity.settings.v1',
+  AUTOSAVE_SEC: 60,
+
+  // ---- world -------------------------------------------------------------
+  WORLD_SEED: 20260417,
+  WORLD_SIZE: 16384,
+  WORLD_HALF: 8192,
+  CHUNK: 256,
+  CHUNKS_PER_SIDE: 64,
+  SEA_LEVEL: 0,
+  GRAVITY: -14.7,
+  DRIVE_SIDE: 'left',
+
+  // ---- simulation --------------------------------------------------------
+  FIXED_DT: 1 / 60,
+  MAX_FIXED_STEPS: 3,
+  MAX_FRAME_DT: 0.1,
+  DAY_LENGTH_SEC: 1440,
+  START_HOUR: 8,
+  ENTITY_CELL: 32,
+  JOBS_BUDGET_MS: 3,
+  JOBS_BUDGET_LOADING_MS: 12,
+
+  // ---- streaming (defaults; quality presets override the radii) ----------
+  LOD0_RADIUS: 320,
+  LOD1_RADIUS: 1100,
+  LOD2_RADIUS: 4500,
+  PHYSICS_RADIUS: 200,
+
+  // ---- population / budgets (mobile "high") ------------------------------
+  NPC_CAP: 32,
+  TRAFFIC_CAP: 24,
+  MAX_DYNAMIC_BODIES: 160,
+  MAX_REAL_LIGHTS: 6,
+  MAX_DRAW_CALLS: 250,
+  MAX_TRIANGLES: 600000,
+
+  // ---- camera ------------------------------------------------------------
+  CAMERA_FOV: 74,
+  CAMERA_NEAR: 0.15,
+  CAMERA_FAR: 9000,
+
+  // ---- input -------------------------------------------------------------
+  MOUSE_SENSITIVITY: 0.0022, // rad per CSS px (pointer lock)
+  TOUCH_SENSITIVITY: 0.0052, // rad per CSS px (look drag)
+  TAP_MAX_MS: 260,
+  TAP_MAX_MOVE: 12,
+  TAP_RANGE: 400,
+
+  // ---- rendering layers --------------------------------------------------
+  LAYER_DEFAULT: 0,
+  LAYER_FX: 1,
+  LAYER_UI3D: 2,
+};
+
+/** Ordered list of quality level ids (worst → best). */
+export const QUALITY_LEVELS = ['low', 'medium', 'high', 'ultra'];
+
+/**
+ * Quality presets. Read through `G.quality.get(key)`; never import this table from gameplay code.
+ * Keys are stable API — add new keys instead of renaming.
+ */
+export const QUALITY_PRESETS = {
+  low: {
+    maxPixelRatio: 1.0,
+    minRenderScale: 0.55,
+    shadowMapSize: 0,
+    shadowDistance: 0,
+    shadowSoft: false,
+    bloom: true,
+    bloomLevels: 3,
+    msaa: 0,
+    fxaa: false,
+    anisotropy: 1,
+    textureSize: 0.5,
+    lodBias: 0.7,
+    viewDistance: 2400,
+    lod0Radius: 200,
+    lod1Radius: 700,
+    lod2Radius: 2400,
+    physicsRadius: 160,
+    npcCap: 12,
+    trafficCap: 10,
+    parkedCap: 12,
+    animalCap: 4,
+    particleCap: 600,
+    decalCap: 64,
+    debrisCap: 24,
+    grassDensity: 0,
+    vegetationDensity: 0.5,
+    propDensity: 0.6,
+    reflections: false,
+    waterQuality: 0,
+    cloudQuality: 0,
+    dynamicLights: 2,
+    envMapSize: 64,
+  },
+  medium: {
+    maxPixelRatio: 1.5,
+    minRenderScale: 0.6,
+    shadowMapSize: 1024,
+    shadowDistance: 80,
+    shadowSoft: false,
+    bloom: true,
+    bloomLevels: 4,
+    msaa: 0,
+    fxaa: true,
+    anisotropy: 2,
+    textureSize: 1,
+    lodBias: 0.85,
+    viewDistance: 3800,
+    lod0Radius: 260,
+    lod1Radius: 900,
+    lod2Radius: 3800,
+    physicsRadius: 180,
+    npcCap: 22,
+    trafficCap: 16,
+    parkedCap: 20,
+    animalCap: 8,
+    particleCap: 1500,
+    decalCap: 128,
+    debrisCap: 48,
+    grassDensity: 0.4,
+    vegetationDensity: 0.75,
+    propDensity: 0.8,
+    reflections: false,
+    waterQuality: 1,
+    cloudQuality: 1,
+    dynamicLights: 4,
+    envMapSize: 128,
+  },
+  high: {
+    maxPixelRatio: 2.0,
+    minRenderScale: 0.6,
+    shadowMapSize: 2048,
+    shadowDistance: 120,
+    shadowSoft: true,
+    bloom: true,
+    bloomLevels: 5,
+    msaa: 4,
+    fxaa: false,
+    anisotropy: 4,
+    textureSize: 1,
+    lodBias: 1,
+    viewDistance: 5200,
+    lod0Radius: 320,
+    lod1Radius: 1100,
+    lod2Radius: 4500,
+    physicsRadius: 200,
+    npcCap: 32,
+    trafficCap: 24,
+    parkedCap: 28,
+    animalCap: 12,
+    particleCap: 3000,
+    decalCap: 256,
+    debrisCap: 80,
+    grassDensity: 0.8,
+    vegetationDensity: 1,
+    propDensity: 1,
+    reflections: true,
+    waterQuality: 2,
+    cloudQuality: 2,
+    dynamicLights: 6,
+    envMapSize: 256,
+  },
+  ultra: {
+    maxPixelRatio: 2.5,
+    minRenderScale: 0.7,
+    shadowMapSize: 4096,
+    shadowDistance: 170,
+    shadowSoft: true,
+    bloom: true,
+    bloomLevels: 6,
+    msaa: 4,
+    fxaa: false,
+    anisotropy: 8,
+    textureSize: 1,
+    lodBias: 1.3,
+    viewDistance: 8000,
+    lod0Radius: 400,
+    lod1Radius: 1400,
+    lod2Radius: 6000,
+    physicsRadius: 220,
+    npcCap: 48,
+    trafficCap: 36,
+    parkedCap: 40,
+    animalCap: 16,
+    particleCap: 6000,
+    decalCap: 512,
+    debrisCap: 140,
+    grassDensity: 1,
+    vegetationDensity: 1.2,
+    propDensity: 1,
+    reflections: true,
+    waterQuality: 3,
+    cloudQuality: 3,
+    dynamicLights: 6,
+    envMapSize: 256,
+  },
+};

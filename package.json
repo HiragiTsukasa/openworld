@@ -1,0 +1,19 @@
+{
+  "name": "mugen-city",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "MUGEN CITY - an original procedural 3D open-world sandbox (portrait, single self-contained HTML).",
+  "scripts": {
+    "build": "node build.mjs",
+    "smoke": "node build.mjs && node tools/smoke.mjs",
+    "shot": "node tools/shot.mjs"
+  },
+  "dependencies": {
+    "@dimforge/rapier3d-compat": "latest",
+    "three": "0.170.0"
+  },
+  "devDependencies": {
+    "esbuild": "latest"
+  }
+}
